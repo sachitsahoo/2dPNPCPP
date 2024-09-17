@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <vector>
-#include <eigen/Dense>
+#include <Eigen/Dense>
 #include <math.h>
 #include "2DPnP.hpp"
 
@@ -11,11 +11,7 @@ using Eigen::Vector2d;
 using Eigen::Vector3d;
 using Eigen::Matrix;
 using Eigen::Matrix2d;
-// Simple Point2D structure to hold 2D points
-struct Point2D {
-    double x;
-    double y;
-};
+using TWOD_PNP_HPP::Point2D;
 
 // Helper function to generate random world points in a specified range
 std::vector<Point2D> generateWorldPoints(int numPoints) {

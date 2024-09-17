@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "dense": "cpp",
+        "*.inc": "cpp",
+        "random": "cpp",
+        "cmath": "cpp"
+    }
+}

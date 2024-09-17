@@ -67,21 +67,17 @@ void refinePose(const vector<Point2D>& worldPoints, const vector<Point2D>& image
     Eigen::Vector3d camera;
     camera << translation.x(), translation.y(), atan2(rotation(1, 0), rotation(0, 0));
 
-    // Define the functor that lsqcpp will optimize
-    auto objective = [&worldPoints, &imagePoints](const Eigen::Vector3d& camera, Eigen::VectorXd& residuals) {
-        residuals.resize(2 * worldPoints.size());
-        for (size_t i = 0; i < worldPoints.size(); ++i) {
-            ReprojectionError error(worldPoints[i], imagePoints[i]);
-            Eigen::Vector2d res;
-            error(camera, res);
-            residuals.segment<2>(2 * i) = res;
-        }
-    };
+    // Create the objective functor
+    ReprojectionObjective objective;
+    objective.worldPoints = worldPoints;
+    objective.imagePoints = imagePoints;
+    objective.beta = cameraAngle;
 
     // Setup the Levenberg-Marquardt optimizer
-    lsqcpp::LevenbergMarquardtX<double, decltype(objective)> optimizer;
+    lsqcpp::LevenbergMarquardtX<double, ReprojectionObjective> optimizer;
     optimizer.setObjective(objective);
     optimizer.setMaximumIterations(100);
+    // You can remove or comment out this line if setNumericalEpsilon doesn't exist
     optimizer.setNumericalEpsilon(1e-6);
 
     // Solve the optimization problem
@@ -97,26 +93,27 @@ void refinePose(const vector<Point2D>& worldPoints, const vector<Point2D>& image
     rotation(1, 1) = cos(camera(2));
 }
 
-int main() {
-    // Example world points (in 2D)
-    vector<Point2D> worldPoints = { {0, 0}, {1, 0}, {0, 1}, {1, 1} };
+
+// int main() {
+//     // Example world points (in 2D)
+//     vector<Point2D> worldPoints = { {0, 0}, {1, 0}, {0, 1}, {1, 1} };
     
-    // Corresponding image points (observed in the camera)
-    vector<Point2D> imagePoints = { {100, 100}, {150, 100}, {100, 150}, {150, 150} };
+//     // Corresponding image points (observed in the camera)
+//     vector<Point2D> imagePoints = { {100, 100}, {150, 100}, {100, 150}, {150, 150} };
 
-    // Variables to hold the camera pose (rotation and translation)
-    Matrix3d rotation;
-    Vector2d translation;
+//     // Variables to hold the camera pose (rotation and translation)
+//     Matrix3d rotation;
+//     Vector2d translation;
 
-    // Compute initial guess for the pose
-    computeInitialPose(worldPoints, imagePoints, rotation, translation);
+//     // Compute initial guess for the pose
+//     computeInitialPose(worldPoints, imagePoints, rotation, translation);
 
-    // Refine the pose using optimization
-    refinePose(worldPoints, imagePoints, rotation, translation);
+//     // Refine the pose using optimization
+//     refinePose(worldPoints, imagePoints, rotation, translation);
 
-    // Output the final pose
-    cout << "Final Rotation Matrix:\n" << rotation << endl;
-    cout << "Final Translation Vector:\n" << translation.transpose() << endl;
+//     // Output the final pose
+//     cout << "Final Rotation Matrix:\n" << rotation << endl;
+//     cout << "Final Translation Vector:\n" << translation.transpose() << endl;
 
-    return 0;
-}
+//     return 0;
+// }

@@ -77,7 +77,7 @@ void refinePose(const vector<Point2D>& worldPoints, const vector<Point2D>& image
     lsqcpp::LevenbergMarquardtX<double, ReprojectionObjective> optimizer;
     optimizer.setObjective(objective);
     optimizer.setMaximumIterations(100);
-    // You can remove or comment out this line if setNumericalEpsilon doesn't exist
+    // You may have to change setNumericalEpsilon in the library, library might have issues?
     optimizer.setNumericalEpsilon(1e-6);
 
     // Solve the optimization problem
